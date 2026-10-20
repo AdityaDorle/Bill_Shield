@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BillShield — A little clarity. A fairer bill.</title>
+  <meta name="description" content="Read your bill, check the maths, and write a message worth sending.">
+  <link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
+</head>
+<body>
+ <aside class="sidebar">
+  <a class="brand" href="/"><span class="logo">B<span>✓</span></span>BillShield<span class="brand-dot">.</span></a>
+  <div class="workspace">YOUR WORKSPACE</div>
+  <nav><button class="nav active" id="nav-review"><span>▤</span> Bill review <span class="nav-arrow">↗</span></button>
+  <button class="nav" id="nav-history"><span>◷</span> Review history <span id="history-count" class="count">0</span></button></nav>
+  <div class="side-note"><span class="tiny-shield">✓</span><h3>Your bill. Your control.</h3><p>AI reads the lines.<br>Code checks the maths.<br>You decide what to send.</p></div>
+  <div class="storage"><span class="status-dot"></span><span id="storage-label">Connecting…</span></div>
+ </aside>
+ <main>
+  <header><span>PERSONAL BILL ASSISTANT</span><div class="header-right"><span class="privacy-dot"></span> Private by design <span class="avatar">You</span></div></header>
+  <div id="alert" role="alert" hidden></div>
+  <section id="review-view">
+   <div class="heading"><div><div class="eyebrow">LESS GUESSWORK. MORE CLARITY.</div><h1>A little clarity.<br>A fairer <span>bill.</span></h1><p>Turn a charge you don’t understand into a question worth asking.</p></div><div class="paper-art" aria-hidden="true"><div class="paper-top">BILL, MEET CLARITY.</div><div class="art-line long"></div><div class="art-line"></div><div class="art-line long"></div><div class="art-total">All accounted for.<span>✓</span></div><span class="art-spark">✳</span></div></div>
+   <ol class="steps"><li class="current" data-step="1"><span>01</span> Add your bill</li><li data-step="2"><span>02</span> Confirm the lines</li><li data-step="3"><span>03</span> Check & act</li></ol>
+   <section id="upload-panel" class="grid">
+    <div class="card upload-card"><div class="section-label">LET’S START HERE</div><h2>What’s on your bill?</h2><p class="muted">Add a photo or PDF. We’ll help you read between the lines.</p>
+     <label class="dropzone" id="dropzone"><input id="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"><span class="upload-icon">↥</span><strong id="file-label">Drop your bill here</strong><span>or <u>browse files</u></span><small>JPG, PNG, WebP or PDF · up to 10 MB · PDF up to 3 pages</small></label>
+     <label class="check consent"><input type="checkbox" id="consent"><span>I agree to send this bill to Groq to read its lines. I’ve covered personal details I don’t want shared.</span></label>
+     <button class="primary full" id="extract">Read my bill <span>↗</span></button>
+     <div class="or"><span></span> or start without an upload <span></span></div>
+     <div class="button-row"><button class="secondary" id="manual">Enter manually</button><button class="text-button" id="demo">Try a sample bill ↗</button></div>
+    </div>
+    <div class="right-column"><div class="card expectation"><span class="tag">A SECOND PAIR OF EYES</span><h2>Know what you’re<br>paying for.</h2><div class="feature"><span>01</span><div><h3>Every line, in the open</h3><p>Review and correct what AI reads before we check anything.</p></div></div><div class="feature"><span>02</span><div><h3>Maths you can follow</h3><p>Compare your bill with the price you were promised.</p></div></div><div class="feature"><span>03</span><div><h3>The right words, ready</h3><p>A grounded message to edit, copy, and send yourself.</p></div></div></div>
+    <div class="privacy-card"><span>◎</span><div><strong>A smaller data footprint.</strong><p>Original uploads aren’t saved. Only reviewed fields and a sanitized bill snapshot are stored.</p></div></div></div>
+   </section>
+   <section id="confirm-panel" hidden>
+    <div class="card"><div class="section-head"><div><div class="section-label">YOU HAVE THE FINAL SAY</div><h2>Confirm what’s on the bill.</h2></div><button class="text-button restart">← Start again</button></div>
+     <div id="extraction-warnings" class="notice" hidden></div>
+     <p class="muted">Check against your original. Exclude subtotal and total rows; credits should be negative. Remove names, addresses, and account details from all text fields.</p>
+     <form id="bill-form">
+      <div class="fields four">
+       <label>Provider<input name="provider" required maxlength="100" placeholder="e.g. Airtel"></label>
+       <label>Currency<select name="currency"><option>INR</option><option>USD</option><option>EUR</option><option>GBP</option></select></label>
+       <label>Bill date<input name="bill_date" type="date" required></label>
+       <label>Printed total<input name="total" type="number" min="0" max="10000000" step=".01" required></label>
+      </div>
+      <details><summary>Billing period & payment dates <span class="muted">Optional · helps check late fees</span></summary><div class="fields four"><label>Period starts<input name="period_start" type="date"></label><label>Period ends<input name="period_end" type="date"></label><label>Due date<input name="due_date" type="date"></label><label>Paid date<input name="paid_date" type="date"></label></div></details>
+      <div class="table-wrap"><table class="line-table"><thead><tr><th>Bill line</th><th>Type</th><th>Amount</th><th>Confirmed adjustment <span title="Only check if this charge or credit legitimately sits outside your promised price.">ⓘ</span></th><th></th></tr></thead><tbody id="line-rows"></tbody></table></div>
+      <button type="button" id="add-line" class="text-button">+ Add a line</button>
+      <div class="promise-box"><div class="section-label">THE OTHER HALF OF THE STORY</div><h3>What were you promised?</h3><div class="fields three"><label>Promised price<input name="expected" required type="number" min="0" max="10000000" step=".01" placeholder="0.00"></label><label>Tax treatment<select name="promise_includes_tax"><option value="true">Already includes tax</option><option value="false">Add confirmed tax rate</option></select></label><label>Tax rate if excluded (%)<input name="expected_tax_rate" type="number" min="0" max="100" step=".001" value="0"></label></div><div class="fields two"><label>Source of promise<input name="promise_source" maxlength="2000" placeholder="e.g. Plan confirmation email, 1 October"></label><label>Effective from<input name="promise_date" type="date"></label></div><label>Evidence or context<textarea name="evidence" maxlength="3000" rows="2" placeholder="What did the provider promise? Keep personal details out."></textarea></label></div>
+      <label class="check"><input type="checkbox" id="confirmed" required><span>I checked these lines, amounts, and the promised price, and removed personal details before saving.</span></label>
+      <div class="form-footer"><span class="muted">Calculated by code. Always.</span><button type="submit" class="primary" id="analyze">Check my bill <span>→</span></button></div>
+     </form>
+    </div>
+   </section>
+   <section id="result-panel" hidden></section>
+  </section>
+  <section id="history-view" hidden><div class="history-heading"><div><div class="eyebrow">YOUR PAPER TRAIL</div><h1>Review history<span>.</span></h1><p class="muted">Every bill, every question, and what happened next.</p></div><button class="primary restart">+ Review a bill</button></div><div id="history-stats" class="stats"></div><div id="history-list"></div></section>
+  <footer><span>BillShield <span class="footer-star">✳</span> Clarity is a good place to start.</span><span>Built for the questions you didn’t ask.</span></footer>
+ </main>
+ <div id="toast" role="status" hidden></div>
+</body></html>

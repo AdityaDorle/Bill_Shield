@@ -1,0 +1,4 @@
+fastapi
+python-dotenv
+requests
+supabase==2.33.0
