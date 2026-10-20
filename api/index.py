@@ -200,4 +200,7 @@ def event(message_id: UUID, body: EventInput, store=Depends(storage)):
     return {**event, "success_bar_met": body.action == "sent" and event["words_changed"] < 20}
 
 
-app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="public")
+# Vercel serves public/ at the CDN and may omit it from the function bundle.
+# Only the local server needs this mount.
+if not os.getenv("VERCEL") and (ROOT / "public").is_dir():
+    app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="public")

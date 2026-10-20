@@ -6,7 +6,11 @@ let currentBill = null, currentDraft = null, selectedFile = null, savedBills = [
 
 async function api(path, options={}) {
   const response = await fetch(path, {...options, headers: options.body instanceof FormData ? {} : {"Content-Type":"application/json"}});
-  const data = await response.json().catch(() => ({detail: "Request failed. Please retry."}));
+  const isJSON = (response.headers.get("content-type") || "").includes("application/json");
+  if (!isJSON) {
+    throw new Error(`The server returned an unexpected response (HTTP ${response.status}). Check that Vercel is using the FastAPI framework and the repository root, then inspect its runtime logs.`);
+  }
+  const data = await response.json().catch(() => ({detail: "The server returned invalid JSON. Please retry."}));
   if (!response.ok) {
     let message = data.detail || "Something went wrong.";
     if (Array.isArray(message)) message = message.map(x => `${x.loc?.slice(1).join(" → ")}: ${x.msg}`).join("; ");

@@ -64,10 +64,30 @@ API workflow, ownership isolation, deletion, validation and cross-origin write r
 ## Deploy to Vercel
 
 Import this repository as a FastAPI Python project, with repository root as root directory.
-`api/index.py` exports the app; `public/` contains assets. Set the variables from
+`app.py` exports the application from `api/index.py`; `pyproject.toml` explicitly declares
+the entry point. `public/` contains CDN-served assets. Leave build and output-directory
+overrides unset; do not set the root directory to `public` or `api`. Set the variables from
 `.env.example` in Vercel, with `STORAGE_MODE=supabase` and `COOKIE_SECURE=true`.
 Configure Supabase first. Local mode refuses requests on Vercel because its filesystem
 is ephemeral. Plan upload/time limits may be lower than the app's local limits.
+
+In Project Settings → Environment Variables, add these for Production (and Preview
+if testing preview deployments), then redeploy:
+
+| Name | Value |
+|---|---|
+| `GROQ_API_KEY` | Copy from your local `.env` |
+| `SUPABASE_URL` | Your project's `https://…supabase.co` URL |
+| `SUPABASE_PUBLISHABLE_KEY` | Copy from your local `.env` |
+| `STORAGE_MODE` | `supabase` |
+| `COOKIE_SECURE` | `true` |
+| `GROQ_VISION_MODEL` | `qwen/qwen3.8-27b` |
+| `GROQ_TEXT_MODEL` | `openai/gpt-oss-120b` |
+
+The GitHub repo does not contain `.env`, so importing it does not copy credentials.
+`/api/health` should return JSON. HTML or a 404 usually indicates routing or deployment
+protection; a 500 requires checking Vercel runtime logs. A JSON setup error from
+`/api/bills` identifies missing configuration or a Supabase setup problem.
 
 ## Submission and limits
 
