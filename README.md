@@ -63,6 +63,9 @@ API workflow, ownership isolation, deletion, validation and cross-origin write r
 
 ## Deploy to Vercel
 
+The deployment targets Python 3.12 via `.python-version`, matching the Vercel runtime.
+The application's supported Python range is declared in `pyproject.toml`.
+
 Import this repository as a FastAPI Python project, with repository root as root directory.
 `app.py` exports the application from `api/index.py`; `pyproject.toml` explicitly declares
 the entry point. `public/` contains CDN-served assets. Leave build and output-directory
